@@ -7,7 +7,14 @@
     "longName": "Daily routine",
     "projectType": "native",
     "resources": {
-        "media": []
+        "media": [
+            {
+                "characterRegex": "[0-9:]",
+                "file": "fonts/LondonMM.ttf",
+                "name": "FONT_TIME_16",
+                "type": "font"
+            }
+        ]
     },
     "sdkVersion": "2",
     "shortName": "Daily routine",
