@@ -9,7 +9,7 @@
     "resources": {
         "media": [
             {
-                "characterRegex": "[A-Za-z!]",
+                "characterRegex": "[A-Za-z!']",
                 "file": "fonts/traphouse.ttf",
                 "name": "FONT_TEXT_36",
                 "type": "font"

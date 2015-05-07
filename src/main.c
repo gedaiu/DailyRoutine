@@ -6,18 +6,23 @@ TextLayer *text_layer;
 GFont time_font;
 GFont text_font;
 
+int old_mode;
+
+int h;
+int m;
+
 int is_sleep_time(int hour) {
 	if(hour < 7)
 		return 1;
 	
-	if(hour > 23)
+	if(hour >= 23)
 		return 1;
 	
 	return 0;
 }
 
 int is_morning(int hour, int minute) {
-	if(hour >= 7 || hour < 9 || (hour == 9 && minute <= 30))
+	if(hour == 7 || (hour == 8 && minute <= 30))
 		return 1;
 
 	return 0;
@@ -54,30 +59,82 @@ int is_evening(int hour) {
 	return 0;
 }
 
-char *get_message(int hour, int minute) {
+int is_work_day(int day) {
+	if(day == 0 || day == 6)
+		return 0;
+		
+	return 1;
+}
+
+int get_mode(int hour, int minute, int day) {
 	
 	if(is_sleep_time(hour))
-		return "Go to\nsleep";
+		return 0;
 		
 	if(is_morning(hour, minute))
-		return "Good\nMorning!";
+		return 1;
 	
-	if(is_go_to_work(hour, minute))
-		return "Go to\nwork";
-	
-	if(is_do_work(hour) && minute <= 30)
-		return "Do your\nwork";
-	
-	if(is_do_work(hour))
-		return "Don't be\nstupid";
+	if(is_work_day(day)) {
+		if(is_go_to_work(hour, minute))
+			return 2;
+
+		if(is_do_work(hour) && minute <= 30)
+			return 3;
+
+		if(is_do_work(hour))
+			return 4;
+	} else {
+		return 6;
+	}
 	
 	if(is_lunch_time(hour))
-		return "Eat\nsomething";
+		return 5;
 	
 	if(is_evening(hour))
-		return "Relax";
+		return 6;
 	
-	return "HELLO";
+	return -1;
+}
+
+void set_message(int mode) {
+	
+	if(mode != old_mode) {
+		old_mode = mode;
+		vibes_double_pulse();
+	}
+	
+	switch(mode) {
+		case 0: 
+			text_layer_set_text(text_layer, "Go to\nsleep");
+			break;
+		
+		case 1: 
+			text_layer_set_text(text_layer, "Good\nMorning!");
+			break;
+		
+		case 2: 
+			text_layer_set_text(text_layer, "Go to\nwork");
+			break;
+		
+		case 3: 
+			text_layer_set_text(text_layer, "Do your\nwork");
+			break;
+		
+		case 4: 
+			text_layer_set_text(text_layer, "Don't be\nlazy");
+			break;
+		
+		case 5: 
+			text_layer_set_text(text_layer, "Eat\nsomething");
+			break;
+		
+		case 6: 
+			text_layer_set_text(text_layer, "Relax");
+			break;
+		
+		default:
+			return text_layer_set_text(text_layer, "HELLO");
+	}
 }
 
 void update_time() {
@@ -101,7 +158,22 @@ void update_time() {
   text_layer_set_text(time_layer, buffer);
 	
 	// Display the text message
-  text_layer_set_text(text_layer, get_message(tick_time->tm_hour, tick_time->tm_min));
+  
+	/* Debug code
+	m+=10;
+	if(m == 60) {
+		m =0;
+		h++;
+	}
+	
+	tick_time->tm_hour = h;
+	tick_time->tm_min = m;
+	*/
+	
+	strftime(buffer, sizeof("00:00"), "%H:%M", tick_time);
+	
+	int mode = get_mode(tick_time->tm_hour, tick_time->tm_min,	tick_time->tm_wday);
+	set_message(mode);	
 }
 
 void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
@@ -140,6 +212,7 @@ void main_window_load(Window *window) {
 static void main_window_unload(Window *window) {
 	// Destroy time font
 	fonts_unload_custom_font(time_font);
+	fonts_unload_custom_font(text_font);
 	
 	// Destroy TextLayers
 	text_layer_destroy(time_layer);
@@ -164,7 +237,7 @@ void handle_init(void) {
 	update_time();
 	
 	// Register with TickTimerService
-	tick_timer_service_subscribe(MINUTE_UNIT, tick_handler);
+	tick_timer_service_subscribe(SECOND_UNIT, tick_handler);
 }
 
 void handle_deinit(void) {
@@ -172,6 +245,10 @@ void handle_deinit(void) {
 }
 
 int main(void) {
+	h = 0;
+	m = 0;
+	old_mode = -1;
+	
   handle_init();
   app_event_loop();
   handle_deinit();
