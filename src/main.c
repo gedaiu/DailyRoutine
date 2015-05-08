@@ -182,7 +182,7 @@ void tick_handler(struct tm *tick_time, TimeUnits units_changed) {
 
 void main_window_load(Window *window) {
 	// Create time TextLayer
-	time_layer = text_layer_create(GRect(0, 150, 144, 20));
+	time_layer = text_layer_create(GRect(0, 140, 144, 30));
 	text_layer_set_background_color(time_layer, GColorBlack);
 	text_layer_set_text_color(time_layer, GColorClear);
 	text_layer_set_text(time_layer, "00:00");
@@ -194,7 +194,7 @@ void main_window_load(Window *window) {
 	text_layer_set_text(text_layer, "Starting...");
 	 
 	// Create GFont
-	time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TIME_16));
+	time_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TIME_23));
 	text_font = fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_TEXT_36));
 	
 	// Improve the layout to be more like a watchface

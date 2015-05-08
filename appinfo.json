@@ -9,15 +9,15 @@
     "resources": {
         "media": [
             {
-                "characterRegex": "[A-Za-z!']",
-                "file": "fonts/traphouse.ttf",
-                "name": "FONT_TEXT_36",
+                "characterRegex": "[0-9:]",
+                "file": "fonts/LondonMM.ttf",
+                "name": "FONT_TIME_23",
                 "type": "font"
             },
             {
-                "characterRegex": "[0-9:]",
-                "file": "fonts/LondonMM.ttf",
-                "name": "FONT_TIME_16",
+                "characterRegex": "[A-Za-z!']",
+                "file": "fonts/traphouse.ttf",
+                "name": "FONT_TEXT_36",
                 "type": "font"
             }
         ]
